@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reasoning Workout (Medium): 40 Pattern, Visual and Puzzle Questions</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--tx:#1d1b2e;--mu:#6b6880;--bd:#dcd8e6;--ac:#3b3bd6;--ok:#16794a;--okb:#e0f4e9;--no:#b3261e;--nob:#fbe4e2;--bg2:#faf9fd}
+@media (prefers-color-scheme:dark){:root{--bg:#14131c;--card:#1e1d2a;--tx:#ecebf5;--mu:#9d9bb3;--bd:#34324a;--ac:#8c8cff;--ok:#6fdca3;--okb:#17372a;--no:#ff8d85;--nob:#3d1d1b;--bg2:#252437}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 Georgia,"Times New Roman",serif}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:2rem;line-height:1.15;margin:12px 0 6px}
+.sub{color:var(--mu);margin:0 0 16px}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--bd);font-family:system-ui,sans-serif;font-size:.9rem}
+.bar .top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.prog{height:6px;background:var(--bd);border-radius:4px;margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+button{font:inherit;cursor:pointer}
+.chips button,.act button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:5px 12px;border-radius:999px;font-size:.85rem}
+.chips button.on{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+.act{display:flex;gap:6px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin:16px 0}
+.meta{font:.8rem system-ui,sans-serif;color:var(--mu);margin-bottom:6px}
+.q{font-size:1.08rem;margin:0 0 12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+svg{display:block;max-width:100%}
+.row svg,.opt svg{background:var(--bg2);border:1px solid var(--bd);border-radius:8px}
+.f{fill:var(--ac);stroke:none}.o{fill:none;stroke:var(--ac);stroke-width:3}.g{stroke:var(--bd);stroke-width:2;fill:none}.tx{fill:var(--tx);font:700 30px system-ui}
+.t{font:700 1.3rem system-ui;color:var(--mu)}
+.qm{display:grid;place-items:center;width:60px;height:60px;border:2px dashed var(--ac);border-radius:8px;font:700 1.6rem system-ui;color:var(--ac)}
+.opts{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.opt{display:flex;align-items:center;gap:10px;text-align:left;padding:9px 12px;border:1.5px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);min-height:46px}
+.opt:hover{border-color:var(--ac)}
+.opt:focus-visible,.chips button:focus-visible,.act button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.opt b{font:700 .85rem system-ui;color:var(--mu);min-width:1.2em}
+.opt.ok{background:var(--okb);border-color:var(--ok)}
+.opt.no{background:var(--nob);border-color:var(--no)}
+.opt:disabled{cursor:default;color:var(--tx)}
+.ex{display:none;margin-top:12px;padding:10px 12px;border-left:4px solid var(--ok);background:var(--okb);border-radius:0 8px 8px 0;font-size:.95rem}
+.card.done .ex,.card.show .ex{display:block}
+.res{display:none;text-align:center;padding:24px;border:2px solid var(--ac);border-radius:12px;margin:20px 0;font-family:system-ui}
+.res.on{display:block}
+@media(max-width:520px){.opts{grid-template-columns:1fr}h1{font-size:1.6rem}}
+@media(prefers-reduced-motion:reduce){.prog i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Reasoning Workout: Medium Level</h1>
+<p class="sub">Medium difficulty. 40 multiple-choice questions on number and letter patterns, visual sequences and logic puzzles. Pick an answer to see the solution.</p>
+<div class="bar">
+ <div class="top">
+  <span><b id="sc">0</b> correct · <b id="an">0</b>/40 answered</span>
+  <span class="chips" id="chips"></span>
+  <span class="act"><button id="sa">Show all solutions</button><button id="rs">Reset</button></span>
+ </div>
+ <div class="prog"><i id="pg"></i></div>
+</div>
+<div id="list"></div>
+<div class="res" id="res"></div>
+</div>
+<script>
+const S=(i,w=60,h=60)=>`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">${i}</svg>`;
+const R=(...a)=>`<div class="row">${a.join('')}</div>`;
+const T=s=>`<b class="t">${s}</b>`, QM='<b class="qm">?</b>';
+const ar=r=>`<path class="f" transform="rotate(${r} 30 30)" d="M30 8L46 30H36V52H24V30H14Z"/>`;
+const sp=(t,x,y,r,f=1)=>{const c=f?'f':'o';
+ if(t=='c')return `<circle class="${c}" cx="${x}" cy="${y}" r="${r}"/>`;
+ if(t=='s')return `<rect class="${c}" x="${x-r}" y="${y-r}" width="${2*r}" height="${2*r}"/>`;
+ if(t=='t')return `<polygon class="${c}" points="${x},${y-r} ${x+r},${y+r*.8} ${x-r},${y+r*.8}"/>`;
+ return `<polygon class="${c}" points="${x},${y-r} ${x+r},${y} ${x},${y+r} ${x-r},${y}"/>`};
+const poly=(n,f)=>{let p=[];for(let i=0;i<n;i++){const a=(-90+360*i/n)*Math.PI/180;p.push((30+24*Math.cos(a)).toFixed(1)+','+(30+24*Math.sin(a)).toFixed(1))}return `<polygon class="${f?'f':'o'}" points="${p.join(' ')}"/>`};
+const dots=n=>{let s='';for(let i=0;i<n;i++)s+=`<circle class="f" cx="${14+(i%3)*16}" cy="${14+Math.floor(i/3)*16}" r="5"/>`;return s};
+const quad=k=>{const p=[[8,8],[30,8],[30,30],[8,30]][k];return `<rect class="f" x="${p[0]}" y="${p[1]}" width="22" height="22"/><rect class="o" x="8" y="8" width="44" height="44"/>`};
+const cir=r=>`<circle class="f" cx="30" cy="30" r="${r}"/>`;
+const FP='M18 10H44V20H28V28H40V38H28V52H18Z';
+const fg=t=>`<path class="f" transform="${t}" d="${FP}"/>`;
+const MIR='translate(60 0) scale(-1 1)',R180='rotate(180 30 30)',FV='translate(0 60) scale(1 -1)';
+const mat=(rows)=>{let s='<path class="g" d="M50 0V150M100 0V150M0 50H150M0 100H150"/>';rows.forEach((r,i)=>r.forEach((t,j)=>{if(t)s+=sp(t,25+50*j,25+50*i,15)}));return s+'<text class="tx" x="125" y="136" text-anchor="middle">?</text>'};
+
+const multi=(t,n)=>{const P={1:[[30,30]],2:[[16,30],[44,30]],3:[[30,14],[16,44],[44,44]],4:[[16,16],[44,16],[16,44],[44,44]],5:[[16,16],[44,16],[30,30],[16,44],[44,44]]};return P[n].map(p=>sp(t,p[0],p[1],8)).join('')};
+const mat2=rows=>{let s='<path class="g" d="M50 0V150M100 0V150M0 50H150M0 100H150"/>';rows.forEach((r,i)=>r.forEach((t,j)=>{if(t)s+=sp(t.toLowerCase(),25+50*j,25+50*i,15,t==t.toLowerCase()?1:0)}));return s+'<text class="tx" x="125" y="136" text-anchor="middle">?</text>'};
+const Q=[];
+const add=(cat,q,o,a,e,v='')=>Q.push({cat,q,o,a,e,v});
+
+// ---------- Pattern (14) ----------
+add('Pattern','What comes next? 3, 7, 16, 35, 74, ?',['148','151','153','155'],2,'Multiply by 2 and add an increasing number: ×2+1, ×2+2, ×2+3, ×2+4, so next is 74 × 2 + 5 = 153.');
+add('Pattern','What comes next? 2, 3, 5, 9, 17, ?',['31','33','34','35'],1,'The differences double: 1, 2, 4, 8, so the next difference is 16. 17 + 16 = 33.');
+add('Pattern','What comes next? 1, 2, 6, 24, 120, ?',['600','720','840','625'],1,'Each term is the previous one multiplied by 2, 3, 4, 5 (factorials). 120 × 6 = 720.');
+add('Pattern','What comes next? 4, 6, 12, 14, 28, 30, ?',['32','60','62','58'],1,'The operations alternate: +2, ×2, +2, ×2, ... After 30 (a +2 step) comes ×2, giving 60.');
+add('Pattern','What comes next? 2, 12, 36, 80, 150, ?',['216','252','264','288'],1,'Each term is n² × (n+1): 1×2, 4×3, 9×4, 16×5, 25×6, so the next is 36 × 7 = 252.');
+add('Pattern','What comes next? B, E, J, Q, ?',['X','Y','Z','W'],2,'Letter positions are 2, 5, 10, 17 with gaps +3, +5, +7, so the next gap is +9: 17 + 9 = 26 = Z.');
+add('Pattern','What comes next? A1, C4, E9, G16, ?',['I25','H25','I24','J36'],0,'Letters step by two (A, C, E, G, I) and numbers are squares (1, 4, 9, 16, 25), giving I25.');
+add('Pattern','What comes next? 6, 11, 21, 36, 56, ?',['76','81','86','91'],1,'Differences are 5, 10, 15, 20, so the next is +25. 56 + 25 = 81.');
+add('Pattern','What comes next? 2, 6, 7, 21, 22, 66, ?',['67','69','198','88'],0,'The operations alternate: ×3, +1, ×3, +1, ... After 66 (a ×3 step) comes +1, giving 67.');
+add('Pattern','What comes next? ZA, YC, XE, WG, ?',['VH','VI','UI','VJ'],1,'The first letter moves back one each time (Z, Y, X, W, V). The second letter moves forward two (A, C, E, G, I). Next: VI.');
+add('Pattern','What comes next? 1, 2, 4, 7, 12, 20, ?',['31','32','33','34'],2,'The differences are 1, 2, 3, 5, 8 (Fibonacci), so the next is +13. 20 + 13 = 33.');
+add('Pattern','What comes next? 1, 3, 6, 11, 18, 29, ?',['40','42','44','47'],1,'The differences are consecutive primes: 2, 3, 5, 7, 11, then 13. 29 + 13 = 42.');
+add('Pattern','What comes next? 4, 7, 12, 19, 28, ?',['37','39','41','43'],1,'Differences are odd numbers 3, 5, 7, 9, so the next is +11. (Also n² + 3: 6² + 3 = 39.)');
+add('Pattern','What comes next? 2, 10, 30, 68, 130, ?',['210','222','236','246'],1,'Each term is n³ + n: 1+1, 8+2, 27+3, 64+4, 125+5, so the next is 216 + 6 = 222.');
+
+// ---------- Visual (13) ----------
+add('Visual','Which figure comes next? The turn between steps changes.',[S(ar(0)),S(ar(90)),S(ar(180)),S(ar(315))],1,'The clockwise turns grow by 45° each step: +45°, +90°, +135°, so next is +180°. 270° + 180° = 450°, which is 90° (pointing right).',R(S(ar(0)),S(ar(45)),S(ar(135)),S(ar(270)),QM));
+add('Visual','Which figure comes next? Two interleaved sequences are at work.',[S(sp('s',30,30,10)),S(sp('s',30,30,12)),S(sp('s',30,30,5)),S(cir(10))],0,'Circles grow by 4 in size (6, 10, 14) at odd positions. Squares shrink by 5 (20, 15, then 10) at even positions, so a smaller square comes next.',R(S(cir(6)),S(sp('s',30,30,20)),S(cir(10)),S(sp('s',30,30,15)),S(cir(14)),QM));
+add('Visual','Which option is the odd one out? Three of them are rotations of the same figure.',[S(fg(R180)),S(fg(MIR)),S(fg('rotate(90 30 30)')),S(fg('rotate(270 30 30)'))],1,'Options A, C and D can all be turned back into the original F. Option B is a mirror image, and no rotation can produce that.');
+add('Visual','Which box completes the third row?',[S(dots(6)),S(dots(7)),S(dots(8)),S(dots(9))],2,'In each row the third box has as many dots as the first two combined: 1+2=3, 2+3=5, so 3+5=8.',R(S(dots(1)),S(dots(2)),S(dots(3)))+R(S(dots(2)),S(dots(3)),S(dots(5)))+R(S(dots(3)),S(dots(5)),QM));
+add('Visual','Which figure comes next? The shaded quarter jumps around.',[S(quad(0)),S(quad(1)),S(quad(3)),S(quad(2))],3,'Number the quarters clockwise from top-left: 0, 1, 2, 3. The shaded one goes 0, 2, 1, 3, so the steps alternate +2, +3, +2 around the square. The next step is +3 from quarter 3, which lands on quarter 2: bottom-right.',R(S(quad(0)),S(quad(2)),S(quad(1)),S(quad(3)),QM));
+add('Visual','How many triangles are in this figure?',['10','12','15','18'],2,'The base is split into 5 segments. Each triangle uses the apex and a run of base segments: 5+4+3+2+1 = 15.',R(S('<path class="o" d="M100 8L10 100H190Z M100 8L46 100 M100 8L82 100 M100 8L118 100 M100 8L154 100"/>',200,110)));
+add('Visual','How many squares of any size are in this 4 × 4 grid?',['16','26','30','32'],2,'Count by size: 16 (1×1) + 9 (2×2) + 4 (3×3) + 1 (4×4) = 30.',R(S('<path class="o" d="M10 10H110V110H10Z M35 10V110 M60 10V110 M85 10V110 M10 35H110 M10 60H110 M10 85H110"/>',120,120)));
+add('Visual','Which figure comes next?',[S(multi('s',5)),S(multi('c',5)),S(multi('s',4)),S(multi('t',5))],0,'Two things change together: the number of shapes goes up by one (1, 2, 3, 4, 5) and the shape cycles triangle, square, circle. Next: five squares.',R(S(multi('t',1)),S(multi('s',2)),S(multi('c',3)),S(multi('t',4)),QM));
+add('Visual','Which shape replaces the question mark?',[S(sp('s',30,30,15)),S(sp('s',30,30,15,0)),S(sp('c',30,30,15)),S(sp('t',30,30,15))],0,'Every row and column has a circle, square and triangle once. The middle column is always hollow and the other columns are solid. The missing shape is a solid square.',R(S(mat2([['c','S','t'],['s','T','c'],['t','C',null]]),150,150)));
+add('Visual','Which box is the odd one out?',[S(dots(3)),S(dots(5)),S(dots(9)),S(dots(7))],2,'The dot counts 3, 5 and 7 are prime numbers. 9 is not (9 = 3 × 3).');
+add('Visual','Which figure comes next? Two features change at once.',[S(poly(7,1)),S(poly(7,0)),S(poly(8,1)),S(poly(6,1))],0,'Sides increase by one each step (3, 4, 5, 6, 7) while the fill alternates solid, hollow, solid, hollow. The 5th figure is a solid 7-sided polygon.',R(S(poly(3,1)),S(poly(4,0)),S(poly(5,1)),S(poly(6,0)),QM));
+add('Visual','The first figure changes to the second by one rule. Apply the same rule to the third figure.',[S(fg('')),S(fg(R180)),S(fg(MIR)),S(fg(FV))],3,'The rule is a left-right mirror. Rotate F by 180° (upside down) and then mirror it left-right: the result is F flipped top to bottom.',R(S(fg('')),T('→'),S(fg(MIR)),T(','),S(fg(R180)),T('→'),QM));
+add('Visual','How many triangles of any size are in this square with both diagonals?',['4','6','8','10'],2,'The diagonals make 4 small triangles. Each pair of neighbouring small triangles forms a larger triangle (half the square), adding 4 more. Total: 8.',R(S('<path class="o" d="M10 10H110V110H10Z M10 10L110 110 M110 10L10 110"/>',120,120)));
+
+// ---------- Puzzle (13) ----------
+add('Puzzle','Five people stand in a line. E is at the far left. A is to the left of B, B is to the left of D, and D is to the left of C. Who is in the middle?',['A','B','D','C'],1,'The order from left is E, A, B, D, C. The person in position 3 is B.');
+add('Puzzle','In a code, TABLE is written as UCCNF. How is CHAIR written in that code?',['DJBKS','DIBJS','DJBJS','EJCKS'],0,'Letters shift alternately +1, +2, +1, +2, +1 (T→U, A→C, B→C, L→N, E→F). So C→D, H→J, A→B, I→K, R→S: DJBKS.');
+add('Puzzle','What is the smaller angle between the hour and minute hands at 4:30?',['30°','45°','60°','75°'],1,'At 4:30 the minute hand is at 180°. The hour hand is halfway between 4 and 5: 4.5 × 30 = 135°. Difference: 45°.');
+add('Puzzle','A is B\'s sister, C is B\'s mother, D is C\'s father and E is D\'s mother. How is A related to D?',['Granddaughter','Daughter','Grandmother','Niece'],0,'C is the mother of both A and B. D is C\'s father, so D is A\'s grandfather and A is his granddaughter. (E is not needed.)');
+add('Puzzle','A man walks 9 km north, then 6 km east, then 1 km south. How far is he from his starting point?',['8 km','10 km','14 km','16 km'],1,'Net movement: 8 km north and 6 km east. By Pythagoras, distance = √(8² + 6²) = √100 = 10 km.');
+add('Puzzle','The sum of the ages of Aman and Bela is 55. Five years ago Aman was twice as old as Bela. How old is Aman now?',['30','35','40','45'],1,'Let Bela be x, so Aman is 55 − x. Then 55 − x − 5 = 2(x − 5), so 50 − x = 2x − 10, x = 20. Aman is 35.');
+add('Puzzle','A can finish a job in 15 days and B can finish it in 10 days. Working together, how many days will they take?',['5','6','12.5','25'],1,'In one day they do 1/15 + 1/10 = 5/30 = 1/6 of the job, so they need 6 days.');
+add('Puzzle','If the 3rd of a month is a Monday, what day is the 25th of the same month?',['Monday','Tuesday','Wednesday','Sunday'],1,'25 − 3 = 22 days later. 22 ÷ 7 leaves remainder 1, so it is one day after Monday: Tuesday.');
+add('Puzzle','Neha ranks 14th from the top in a class of 40. What is her rank from the bottom?',['25','26','27','28'],2,'Rank from bottom = 40 − 14 + 1 = 27.');
+add('Puzzle','Three people speak. A: "Exactly one of us is lying." B: "Exactly two of us are lying." C: "All three of us are lying." Who is telling the truth?',['Only A','Only B','Only C','Nobody'],1,'C cannot be truthful, since that would make C a liar. If A were truthful, there would be exactly one liar, but then B and C would both be lying (two liars). Contradiction. If B is truthful, exactly two are lying (A and C), which fits everything.');
+add('Puzzle','A bag has 4 red and 6 blue marbles. What is the minimum number you must draw (without looking) to be sure of having at least 2 red marbles?',['2','6','8','10'],2,'In the worst case you draw all 6 blue marbles first. The next 2 draws must be red, so 6 + 2 = 8.');
+add('Puzzle','A two-digit number has digits that add up to 9. Reversing the digits gives a number 27 greater. What is the number?',['27','36','45','18'],1,'Let the digits be a and b with a + b = 9. Reversing adds 9(b − a) = 27, so b − a = 3. Then a = 3 and b = 6: the number is 36 (and 63 − 36 = 27).');
+add('Puzzle','Three boxes are labelled Apples, Oranges and Mixed, but every label is wrong. You may take one fruit out of one box. Which box should you pick from to fix all labels?',['The box labelled Apples','The box labelled Oranges','The box labelled Mixed','Any box works'],2,'The box labelled Mixed cannot be mixed, so it holds only one fruit type. Whatever you draw tells you what it is, and the other two boxes can then be deduced since all labels are wrong.');
+
+// ---------- UI ----------
+const L='ABCD',list=document.getElementById('list'),cats=['All','Pattern','Visual','Puzzle'];
+let score=0,done=0,filter='All';
+list.innerHTML=Q.map((x,i)=>`<section class="card" data-c="${x.cat}" id="q${i}">
+<div class="meta">Question ${i+1} of 40 · ${x.cat} reasoning</div>
+<p class="q">${x.q}</p>${x.v}
+<div class="opts">${x.o.map((o,j)=>`<button class="opt" data-i="${i}" data-j="${j}"><b>${L[j]}</b>${o}</button>`).join('')}</div>
+<div class="ex"><strong>Answer: ${L[x.a]}.</strong> ${x.e}</div></section>`).join('');
+list.addEventListener('click',e=>{
+ const b=e.target.closest('.opt');if(!b||b.disabled)return;
+ const i=+b.dataset.i,j=+b.dataset.j,x=Q[i],c=document.getElementById('q'+i);
+ c.classList.add('done');
+ c.querySelectorAll('.opt').forEach((o,k)=>{o.disabled=true;if(k==x.a)o.classList.add('ok');else if(k==j)o.classList.add('no')});
+ done++;if(j==x.a)score++;upd();
+});
+function upd(){
+ sc.textContent=score;an.textContent=done;pg.style.width=done/40*100+'%';
+ if(done==40){res.className='res on';res.innerHTML=`<h2 style="margin:0 0 6px">You scored ${score} / 40 (${Math.round(score/40*100)}%)</h2><p style="margin:0">${score>=34?'Excellent reasoning.':score>=24?'Solid work. Review the solutions you missed.':'Good start. Read the solutions and try again.'}</p>`}
+}
+chips.innerHTML=cats.map(c=>`<button class="${c=='All'?'on':''}">${c}</button>`).join('');
+chips.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;filter=b.textContent;
+ chips.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x==b));
+ document.querySelectorAll('.card').forEach(c=>c.style.display=(filter=='All'||c.dataset.c==filter)?'':'none')});
+let all=false;
+sa.onclick=()=>{all=!all;document.querySelectorAll('.card').forEach(c=>c.classList.toggle('show',all));sa.textContent=all?'Hide unanswered solutions':'Show all solutions'};
+rs.onclick=()=>{score=done=0;all=false;sa.textContent='Show all solutions';res.className='res';
+ document.querySelectorAll('.card').forEach(c=>{c.classList.remove('done','show')});
+ document.querySelectorAll('.opt').forEach(o=>{o.disabled=false;o.classList.remove('ok','no')});upd();scrollTo(0,0)};
+</script>
+</body>
+</html>
